@@ -1,4 +1,4 @@
-Cardboard SDK
+Cardboard SDK, fork from googlevr/cardboard
 =============
 Copyright 2019 Google LLC.  All rights reserved.
 
@@ -12,6 +12,10 @@ experiences for Google Cardboard. It supports essential VR features, such as:
 With these capabilities you can build entirely new VR experiences, or enhance
 existing apps with VR capabilities.
 
+## About this Fork
+
+This fork is used for mobfish Cardboard VR Unity SDK. Changes for Android (and maybe iOS) will be applied here.  
+Link: https://github.com/mobfishgmbh/Cardboard-VR-Unity-SDK
 
 ## Get started
 

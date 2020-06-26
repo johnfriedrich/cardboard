@@ -16,7 +16,6 @@
 package com.google.cardboard.sdk.qrcode;
 
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import com.google.cardboard.sdk.deviceparams.CardboardV1DeviceParams;
@@ -68,6 +67,15 @@ public abstract class CardboardParamsUtils {
           .authority(URI_HOST_GOOGLE_SHORT)
           .appendEncodedPath(URI_PATH_CARDBOARD_HOME)
           .build();
+
+  public static File INTERNAL_FILE_PARENT = null;
+
+  public static void setNewFileParent(String newLocation) {
+    File testFile = new File(newLocation);
+    if(testFile.exists() && testFile.isDirectory()) {
+      INTERNAL_FILE_PARENT = testFile;
+    }
+  }
 
   /**
    * Obtains the physical parameters of a Cardboard headset from a Uri (as bytes).
@@ -122,9 +130,10 @@ public abstract class CardboardParamsUtils {
    * @return true if the given URI identifies a Cardboard device using current scheme.
    */
   private static boolean isCardboardDeviceUri(Uri uri) {
-    return HTTPS_SCHEME.equals(uri.getScheme())
-        && URI_HOST_GOOGLE.equals(uri.getAuthority())
-        && ("/" + URI_PATH_CARDBOARD_CONFIG).equals(uri.getPath());
+      return uri.getQueryParameter(URI_KEY_PARAMS) != null;
+//    return HTTPS_SCHEME.equals(uri.getScheme())
+//        && URI_HOST_GOOGLE.equals(uri.getAuthority())
+//        && ("/" + URI_PATH_CARDBOARD_CONFIG).equals(uri.getPath());
   }
 
   /**
@@ -158,8 +167,12 @@ public abstract class CardboardParamsUtils {
    * @throws IllegalStateException If the configuration folder path exists but it's not a folder.
    */
   private static File getDeviceParamsFile() {
+    if(INTERNAL_FILE_PARENT == null) {
+      return null;
+    }
+
     File configFolder =
-        new File(Environment.getExternalStorageDirectory(), CARDBOARD_CONFIG_FOLDER);
+        new File(INTERNAL_FILE_PARENT, CARDBOARD_CONFIG_FOLDER);
 
     if (!configFolder.exists()) {
       configFolder.mkdirs();
@@ -177,6 +190,10 @@ public abstract class CardboardParamsUtils {
    * @return The stored params. Null if the params do not exist or the read fails.
    */
   public static byte[] readDeviceParamsFromExternalStorage() {
+    if(INTERNAL_FILE_PARENT == null) {
+      return null;
+    }
+
     byte[] paramBytes = null;
 
     try {
@@ -236,6 +253,21 @@ public abstract class CardboardParamsUtils {
       Log.w(TAG, "Error reading parameters: " + e);
     }
     return null;
+  }
+
+  public static boolean writeDeviceParamsToStorage(String uriString) {
+    Uri tempUri = Uri.parse(uriString);
+    if(tempUri == null) {
+      Log.w(TAG, "writeDeviceParamsToStorage() from uriString fail, string not valid");
+      return false;
+    }
+    byte[] result = createFromUri(Uri.parse(uriString));
+    if(result==null) {
+      Log.w(TAG, "writeDeviceParamsToStorage() convert uri to param byte failed.");
+      return false;
+    }
+
+    return writeDeviceParamsToExternalStorage(result);
   }
 
   /**

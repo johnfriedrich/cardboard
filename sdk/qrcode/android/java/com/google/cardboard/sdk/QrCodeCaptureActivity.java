@@ -74,6 +74,8 @@ public class QrCodeCaptureActivity extends AppCompatActivity
     setContentView(R.layout.qr_code_capture);
 
     cameraSourcePreview = findViewById(R.id.preview);
+    if(CardboardParamsUtils.INTERNAL_FILE_PARENT == null)
+      CardboardParamsUtils.INTERNAL_FILE_PARENT = getExternalFilesDir(null);
   }
 
   /**

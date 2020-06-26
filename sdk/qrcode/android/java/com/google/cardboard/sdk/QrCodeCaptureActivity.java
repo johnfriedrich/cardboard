@@ -87,16 +87,13 @@ public class QrCodeCaptureActivity extends AppCompatActivity
     boolean cameraPermission =
         ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED;
-    boolean writePermission =
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            == PackageManager.PERMISSION_GRANTED;
-    return (cameraPermission && writePermission);
+    return (cameraPermission);
   }
 
   /** Handles the requests for activity permissions. */
   private void requestPermissions() {
     final String[] permissions =
-        new String[] {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        new String[] {Manifest.permission.CAMERA};
     ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_CODE);
   }
 
@@ -108,8 +105,6 @@ public class QrCodeCaptureActivity extends AppCompatActivity
     if (!arePermissionsEnabled()) {
       Toast.makeText(this, R.string.no_permissions, Toast.LENGTH_LONG).show();
       if (!ActivityCompat.shouldShowRequestPermissionRationale(
-              this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-          || !ActivityCompat.shouldShowRequestPermissionRationale(
               this, Manifest.permission.CAMERA)) {
         // Permission denied with checking "Do not ask again".
         launchPermissionsSettings();

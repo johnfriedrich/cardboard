@@ -112,7 +112,7 @@ public abstract class CardboardParamsUtils {
   private static boolean isOriginalCardboardDeviceUri(Uri uri) {
     // Note for "cardboard:" scheme case we're lax about path, parameters, etc. since
     // some viewers compatible with original Cardboard are known to take liberties.
-    return URI_ORIGINAL_CARDBOARD_QR_CODE.equals(uri);
+    return ((URI_ORIGINAL_CARDBOARD_QR_CODE.equals(uri)) || uri.toString().endsWith("g.co/cardboard"));
   }
 
   /**

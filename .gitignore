@@ -1,3 +1,7 @@
+# This Project Specific
+
+libraries/
+
 # Built application files
 *.apk
 *.aar

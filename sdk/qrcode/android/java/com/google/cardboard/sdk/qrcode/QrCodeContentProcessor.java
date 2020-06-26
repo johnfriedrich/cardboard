@@ -135,12 +135,14 @@ public class QrCodeContentProcessor {
    * @return Cardboard device parameters, or null if there is an error.
    */
   private static QrCodeToParamsStatus getParamsFromQrCode(Barcode barcode, UrlFactory urlFactory) {
-    if (barcode.valueFormat != Barcode.TEXT) {
+    if (barcode.valueFormat != Barcode.TEXT && barcode.valueFormat != Barcode.URL) {
+      Log.w(TAG, "getParamsFromQrCode() QR Code is neither Text nor URL");
       return QrCodeToParamsStatus.error(QrCodeToParamsStatus.STATUS_UNEXPECTED_FORMAT);
     }
 
     Uri uri = Uri.parse(barcode.rawValue);
     if (uri == null) {
+      Log.w(TAG, "getParamsFromQrCode() URI can't be parsed.");
       return QrCodeToParamsStatus.error(QrCodeToParamsStatus.STATUS_UNEXPECTED_FORMAT);
     }
 
@@ -158,11 +160,13 @@ public class QrCodeContentProcessor {
     }
 
     if (uri == null) {
+      Log.w(TAG, "getParamsFromQrCode() URI is null after redirect.");
       return QrCodeToParamsStatus.error(QrCodeToParamsStatus.STATUS_UNEXPECTED_FORMAT);
     }
 
     byte[] params = CardboardParamsUtils.createFromUri(uri);
     if (params == null) {
+      Log.w(TAG, "getParamsFromQrCode() uri to params result is null.");
       return QrCodeToParamsStatus.error(QrCodeToParamsStatus.STATUS_UNEXPECTED_FORMAT);
     }
     return QrCodeToParamsStatus.success(params);
@@ -186,7 +190,7 @@ public class QrCodeContentProcessor {
     int numRedirects = 0;
     while (uri != null && !CardboardParamsUtils.isCardboardUri(uri)) {
       if (numRedirects >= maxRedirects) {
-        return null;
+        return uri;
       }
       uri = resolveHttpsRedirect(uri, urlFactory);
       numRedirects++;
@@ -205,7 +209,7 @@ public class QrCodeContentProcessor {
   private static Uri resolveHttpsRedirect(Uri uri, UrlFactory urlFactory) throws IOException {
     HttpsURLConnection connection = urlFactory.openHttpsConnection(uri);
     if (connection == null) {
-      return null;
+      return uri;
     }
     // Rather than follow redirects internally, we follow one hop at the time.
     // We don't want to issue even a HEAD request to the Cardboard URI.
@@ -220,22 +224,22 @@ public class QrCodeContentProcessor {
       connection.setRequestMethod("HEAD");
     } catch (ProtocolException e) {
       Log.w(TAG, e.toString());
-      return null;
+      return uri;
     }
     try {
       connection.connect();
       int responseCode = connection.getResponseCode();
       if (responseCode != HttpsURLConnection.HTTP_MOVED_PERM
           && responseCode != HttpsURLConnection.HTTP_MOVED_TEMP) {
-        return null;
+        return uri;
       }
       String location = connection.getHeaderField("Location");
       if (location == null) {
-        return null;
+        return uri;
       }
       Uri redirectUri = Uri.parse(location.replaceFirst(HTTP_SCHEME_PREFIX, HTTPS_SCHEME_PREFIX));
       if (redirectUri == null || redirectUri.compareTo(uri) == 0) {
-        return null;
+        return uri;
       }
       Log.d(TAG, "Param URI redirect to " + redirectUri);
       uri = redirectUri;

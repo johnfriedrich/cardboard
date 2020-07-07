@@ -44,6 +44,7 @@ void showQRScanViewController() {
       [[CardboardQRScanViewController alloc] initWithCompletion:^(BOOL succeeded) {
         incrementQrCodeScanCount();
         [qrViewController dismissViewControllerAnimated:YES completion:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"QRCodeScanned" object:nil];
       }];
 
   qrViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;

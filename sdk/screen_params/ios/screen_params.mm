@@ -129,7 +129,7 @@ CGFloat getDpi() {
     @"iPhone12,1" : kGIPDeviceGenerationiPhone11,
     @"iPhone12,3" : kGIPDeviceGenerationiPhone11Pro,
     @"iPhone12,5" : kGIPDeviceGenerationiPhone11ProMax,
-    @"iPhone12,6" : kGIPDeviceGenerationiPhoneSE,
+    @"iPhone12,8" : kGIPDeviceGenerationiPhoneSE,
     @"iPhone13,1" : kGIPDeviceGenerationiPhone12Mini,
     @"iPhone13,2" : kGIPDeviceGenerationiPhone12,
     @"iPhone13,3" : kGIPDeviceGenerationiPhone12Pro,
